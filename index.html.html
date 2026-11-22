@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spelling Bee — Unit 7</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#14213d;--mute:#5b667d;--line:#dde1ec;--honey:#f5b700;--on-honey:#14213d;--ok:#1f8a4c;--ok-bg:#e3f5ea;--bad:#c0392b;--bad-bg:#fbe8e5;--empty:#6b7280;--empty-bg:#eceef3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1525;--card:#18213a;--ink:#eef1f8;--mute:#9aa5bf;--line:#2b3656;--ok:#5fd08a;--ok-bg:#183a2a;--bad:#ff8b7d;--bad-bg:#4a2320;--empty:#a3adc4;--empty-bg:#26304d}}
+:root[data-theme="dark"]{--bg:#0e1525;--card:#18213a;--ink:#eef1f8;--mute:#9aa5bf;--line:#2b3656;--ok:#5fd08a;--ok-bg:#183a2a;--bad:#ff8b7d;--bad-bg:#4a2320;--empty:#a3adc4;--empty-bg:#26304d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+h1{font:700 34px/1.1 Georgia,"Times New Roman",serif;margin:8px 0 6px}
+p.lead{color:var(--mute);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.facts{display:flex;gap:12px;margin:0 0 20px}
+.fact{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
+.fact b{display:block;font-size:24px}
+.fact span{color:var(--mute);font-size:14px}
+label{display:block;font-weight:600;margin:0 0 6px}
+input[type=text]{width:100%;font:inherit;font-size:18px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+input[type=text]:focus{outline:3px solid var(--honey);border-color:var(--honey)}
+button{font:inherit;font-weight:600;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:12px 18px;cursor:pointer}
+button:focus-visible{outline:3px solid var(--honey);outline-offset:2px}
+button.primary{background:var(--honey);border-color:var(--honey);color:var(--on-honey)}
+button:disabled{opacity:.4;cursor:default}
+.start-btn{width:100%;margin-top:14px;font-size:18px;padding:14px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.timer{font:700 22px ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--honey);width:0}
+.ru{font:700 30px/1.2 Georgia,"Times New Roman",serif;margin:4px 0 6px;overflow-wrap:anywhere}
+.uz{color:var(--mute);font-size:20px;margin:0 0 18px;overflow-wrap:anywhere}
+.nav{display:flex;gap:10px;margin-top:14px}
+.nav button{flex:1}
+.fin{margin-top:14px;width:100%}
+.big{font:700 44px/1 Georgia,serif;margin:4px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{border-radius:999px;padding:4px 12px;font-size:14px;font-weight:600}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.empty{background:var(--empty-bg);color:var(--empty)}
+.tabs{display:flex;gap:8px;margin:16px 0 10px}
+.tabs button[aria-pressed=true]{background:var(--honey);border-color:var(--honey);color:var(--on-honey)}
+.row{background:var(--card);border:1px solid var(--line);border-left-width:6px;border-radius:12px;padding:10px 14px;margin-bottom:8px}
+.row.ok{border-left-color:var(--ok)}.row.bad{border-left-color:var(--bad)}.row.empty{border-left-color:var(--empty)}
+.row b{font-size:18px}
+.row small{display:block;color:var(--mute)}
+.row .st{font-size:14px;font-weight:600}
+.row.ok .st{color:var(--ok)}.row.bad .st{color:var(--bad)}.row.empty .st{color:var(--empty)}
+.again{width:100%;margin-top:12px}
+.modal{position:fixed;inset:0;background:rgba(10,15,30,.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal[hidden]{display:none}
+.modal .card{max-width:360px;width:100%}
+.modal h2{margin:0 0 14px;font-size:20px}
+.modal .nav{margin-top:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<section id="s-start">
+  <h1>Spelling Bee</h1>
+  <p class="lead">Словарный экзамен по английскому. Вы видите слово по-русски и по-узбекски и пишете его по-английски без ошибок. Слова идут одно за другим в случайном порядке, завершить можно в любой момент.</p>
+  <div class="facts">
+    <div class="fact"><b>20:00</b><span>время</span></div>
+    <div class="fact"><b>1 балл</b><span>за слово</span></div>
+    <div class="fact"><b id="cnt">70</b><span>слов, Unit 7</span></div>
+  </div>
+  <div class="card">
+    <label for="name">Ваше имя (по желанию)</label>
+    <input id="name" type="text" autocomplete="off" maxlength="40">
+    <button class="primary start-btn" id="go">Начать экзамен</button>
+  </div>
+</section>
+
+<section id="s-exam" hidden>
+  <div class="top"><span id="pos" style="color:var(--mute);font-weight:600"></span><span class="timer" id="tm">20:00</span></div>
+  <div class="bar"><i id="pb"></i></div>
+  <div class="card">
+    <div class="ru" id="ru"></div>
+    <div class="uz" id="uz"></div>
+    <label for="ans">Напишите по-английски</label>
+    <input id="ans" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next">
+  </div>
+  <div class="nav"><button id="next" class="primary">Далее</button></div>
+  <button class="fin" id="fin">Завершить</button>
+</section>
+
+<section id="s-res" hidden>
+  <div class="card">
+    <div id="who" style="color:var(--mute)"></div>
+    <div class="big" id="score"></div>
+    <div id="meta" style="color:var(--mute)"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="tabs"><button id="t-all" aria-pressed="true">Все</button><button id="t-err" aria-pressed="false">Ошибки</button></div>
+  <div id="list"></div>
+  <button class="primary again" id="again">Пройти ещё раз</button>
+</section>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="mh">
+    <h2 id="mh">Завершить экзамен?</h2>
+    <div class="nav"><button id="m-no">Продолжить</button><button id="m-yes" class="primary">Завершить</button></div>
+  </div>
+</div>
+
+<script>
+var RAW = [
+"бутылка …|(bir) shisha|a bottle of",
+"способность|qobiliyat|ability",
+"объявление|e’lon|advert",
+"животное|hayvon|animal",
+"плохо|yomon|badly",
+"поведение|hulq-atvor|behaviour",
+"птица|qush|bird",
+"скучно|zerikkan|bored",
+"скучный|zerikarli|boring",
+"ящик, коробка|quti, korobka|box",
+"компьютерные навыки|kompyuter ko’nikmalari|computer skills",
+"связаться|aloqa qilmoq, bog’lanmoq|contact",
+"готовить|pishirmoq|cook",
+"стоить|narxlanmoq, narx turmoq|cost",
+"танцевать|raqsga tushmoq|dance",
+"дельфин|delfin|dolphin",
+"друг друга|bir-birini / -ga / -dan|each other",
+"электрическое пианино|elektrik pianino|electric piano",
+"восторженный; полный энтузиазма|shijoatli|enthusiastic",
+"быстрый|tez|fast",
+"летать|uchmoq|fly",
+"иностранный язык|xorijiy til|foreign language",
+"заходить в фейсбук|feysbukga kirmoq|go on Facebook",
+"ходить на прогулку с друзьями|do’stlari bilan sayrga chiqmoq|go out with friends",
+"ходить в кино|kinoga bormoq|go to the cinema",
+"ходить в театр|teatrga bormoq|go to the theatre",
+"золотая рыбка|oltin baliq|goldfish",
+"горилла|gorilla|gorilla",
+"путеводитель, гид|yo’lboshlovchi, gid|guide",
+"ненавидеть|yomon ko’rmoq|hate",
+"увлечение|qiziqish mashg’uloti|hobby",
+"интерес|qiziqish|interest",
+"интересоваться|qiziqqan|interested in",
+"знать|bilmoq|know",
+"слушать музыку|musiqa tinglamoq|listen to music",
+"заблудился, потерянный|adashgan, yo’qolib qolgan|lost",
+"делать вещи|narsalar tayyorlamoq|make things",
+"никто|hech kim|nobody",
+"кисть|mo’yqalam|paintbrush",
+"попугай|to’ti|parrot",
+"картина|surat|picture",
+"играть спортивные игры|sport o’yinlarini o’ynamoq|play sport",
+"играть в видеоигры|video o’yinlari o’ynamoq|play video games",
+"пост|post, xabar, e’lon|post",
+"записывать|yozib olmoq|record",
+"запоминать|eslamoq|remember",
+"исследование|tadqiqod|research",
+"ездить верхом|minmoq|ride",
+"бегать|yugurmoq|run",
+"место, сиденье|o’rindiq, joy|seat",
+"покупать что-нибудь онлайн|onlayn xarid qilmoq|shop online",
+"знак, символ|belgi|sign",
+"петь|kuylamoq|sing",
+"навыки|ko’nikma, mahorat|skill",
+"медленно|sekin-asta|slowly",
+"социальная медиа|ijtimoiy tarmoq|social media",
+"плавать|suzmoq|swim",
+"пловец|suzuvchi|swimmer",
+"фотографировать|suratga olmoq|take photos",
+"жаждущий|chanqagan|thirsty",
+"турист|sayyoh|tourist",
+"переводчик|tarjimon|translator",
+"печатать|harf termoq|type",
+"машинист|mashinist|typist",
+"видео|video|video",
+"волонтёр|ko’ngilli|volunteer",
+"смотреть спортивные передачи|sport oyinlari tomosha qilmoq|watch sport",
+"хорошо|yaxshi|well",
+"работать в саду|bog’da ishlamoq|work in the garden",
+"писать|yozmoq|write"
+];
+var W = RAW.map(function(l){var p=l.split("|");return{r:p[0],u:p[1],e:p[2]}});
+var TOTAL = 20*60;
+var $ = function(id){return document.getElementById(id)};
+var order, idx, ans, endAt, tick, started, results, who;
+
+function show(id){["s-start","s-exam","s-res"].forEach(function(s){$(s).hidden = s!==id});window.scrollTo(0,0)}
+function norm(s){return (s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").trim()}
+function fmt(sec){sec=Math.max(0,sec);var m=Math.floor(sec/60),s=sec%60;return (m<10?"0":"")+m+":"+(s<10?"0":"")+s}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function start(){
+  who = $("name").value.trim();
+  order = shuffle(W.map(function(_,i){return i}));
+  ans = {}; idx = 0; started = Date.now(); endAt = started + TOTAL*1000;
+  show("s-exam"); render();
+  clearInterval(tick); tick = setInterval(update,250); update();
+}
+function update(){
+  var left = Math.ceil((endAt-Date.now())/1000);
+  $("tm").textContent = fmt(left);
+  $("tm").classList.toggle("low", left<=60);
+  if(left<=0) finish();
+}
+function render(){
+  var w = W[order[idx]];
+  $("ru").textContent = w.r;
+  $("uz").textContent = w.u;
+  $("ans").value = ans[order[idx]] || "";
+  $("pos").textContent = (idx+1)+" / "+order.length;
+  $("pb").style.width = (idx/order.length*100)+"%";
+  $("next").textContent = idx===order.length-1 ? "Завершить" : "Далее";
+  $("ans").focus();
+}
+function save(){ans[order[idx]] = $("ans").value}
+function next(){
+  save();
+  if(idx===order.length-1){$("modal").hidden=false;return}
+  idx++; render();
+}
+
+function finish(){
+  clearInterval(tick);
+  if(!$("s-exam").hidden) save();
+  $("modal").hidden = true;
+  var ok=0,bad=0,empty=0;
+  results = W.map(function(w,i){
+    var a = ans[i]||"", st;
+    if(!norm(a)){st="empty";empty++}
+    else if(norm(a)===norm(w.e)){st="ok";ok++}
+    else {st="bad";bad++}
+    return {w:w,a:a,st:st,i:i};
+  });
+  var spent = Math.min(TOTAL, Math.round((Date.now()-started)/1000));
+  $("who").textContent = who ? who : "Результат";
+  $("score").textContent = ok+" из "+W.length;
+  $("meta").textContent = ok+" "+(ok%10===1&&ok%100!==11?"балл":(ok%10>=2&&ok%10<=4&&(ok%100<10||ok%100>=20)?"балла":"баллов"))+", время "+fmt(spent);
+  $("chips").innerHTML = '<span class="chip ok">верно: '+ok+'</span><span class="chip bad">с ошибкой: '+bad+'</span><span class="chip empty">пусто: '+empty+'</span>';
+  setTab(false);
+  show("s-res");
+}
+function setTab(errOnly){
+  $("t-all").setAttribute("aria-pressed", String(!errOnly));
+  $("t-err").setAttribute("aria-pressed", String(errOnly));
+  var box = $("list"); box.textContent = "";
+  var labels = {ok:"верно",bad:"с ошибкой",empty:"пусто"};
+  var shown = results.filter(function(r){return !errOnly || r.st!=="ok"});
+  if(!shown.length){var p=document.createElement("p");p.style.color="var(--mute)";p.textContent="Ошибок нет.";box.appendChild(p);return}
+  shown.forEach(function(r){
+    var d=document.createElement("div");d.className="row "+r.st;
+    var b=document.createElement("b");b.textContent=r.w.e;
+    var s1=document.createElement("small");s1.textContent=r.w.r+" · "+r.w.u;
+    var s2=document.createElement("small");s2.className="st";
+    s2.textContent = labels[r.st] + (r.st==="bad" ? ": "+r.a.trim() : "");
+    d.appendChild(b);d.appendChild(s1);d.appendChild(s2);box.appendChild(d);
+  });
+}
+
+$("cnt").textContent = W.length;
+$("go").onclick = start;
+$("name").onkeydown = function(e){if(e.key==="Enter")start()};
+$("ans").onkeydown = function(e){if(e.key==="Enter"){e.preventDefault();next()}};
+$("next").onclick = next;
+$("fin").onclick = function(){save();$("modal").hidden=false};
+$("m-no").onclick = function(){$("modal").hidden=true;$("ans").focus()};
+$("m-yes").onclick = finish;
+$("t-all").onclick = function(){setTab(false)};
+$("t-err").onclick = function(){setTab(true)};
+$("again").onclick = function(){show("s-start")};
+</script>
+</body>
+</html>
